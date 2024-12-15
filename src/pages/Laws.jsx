@@ -22,7 +22,7 @@ const Laws = () => {
     let destination = localStorage.getItem("destination") || "texas";
     try {
       const response = await axios.post(
-        `http://localhost:8000/api/v1/states/compare`,
+        import.meta.env.VITE_BACKEND_BASE_URL + "/api/v1/states/compare",
         {
           source_state: source,
           target_state: destination,

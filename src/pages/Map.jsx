@@ -82,7 +82,7 @@ const Map = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen py-3 bg-gradient-to-br from-blue-50 to-blue-100">
       <div className="p-4">
         <label
           htmlFor="city"
@@ -104,9 +104,7 @@ const Map = () => {
               </option>
             ))}
           </select>
-          <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-            <MapPin className="h-5 w-5 text-gray-400" />
-          </div>
+          <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none"></div>
         </div>
       </div>
       <div className="flex-1">
