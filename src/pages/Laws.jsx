@@ -9,7 +9,6 @@ const Laws = () => {
   const [error, setError] = useState(null);
 
   const categories = [
-    { id: "laws", label: "All" },
     { id: "property", label: "Property" },
     { id: "taxes", label: "Taxes" },
     { id: "education", label: "Education" },
