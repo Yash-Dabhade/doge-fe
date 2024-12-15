@@ -4,8 +4,8 @@ import BottomNav from "./components/layout/BottomNav";
 import Dashboard from "./pages/Dashboard";
 import Laws from "./pages/Laws";
 import Assistant from "./pages/Assistant";
-import Property from "./pages/Property";
 import Emergency from "./pages/Emergency";
+import Map from "./pages/Map";
 
 // Main application component that handles navigation and layout
 function App() {
@@ -24,8 +24,8 @@ function App() {
       case "assistant":
         return <Assistant />;
 
-      case "property":
-        return <Property />;
+      case "map":
+        return <Map />;
 
       case "emergency":
         return <Emergency />;

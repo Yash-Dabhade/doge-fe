@@ -1,113 +1,143 @@
-import React from "react";
-import {
-  AlertTriangle,
-  BookOpen,
-  ExternalLink,
-  Shield,
-  Info,
-  AlertCircle,
-} from "lucide-react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { BookOpen, ExternalLink, Info, Loader2 } from "lucide-react";
 
 const Laws = () => {
-  // Sample rules data - in a real app, this would likely be passed as props
-  const rules = [
-    {
-      id: 1,
-      title: "Authentication Required",
-      description:
-        "All API endpoints must require proper authentication tokens for access. This ensures secure data transmission and prevents unauthorized access to sensitive information.",
-      impact: "high",
-      source: "https://security-guidelines.com/auth",
-    },
-    {
-      id: 2,
-      title: "Input Validation",
-      description:
-        "All user inputs must be validated and sanitized before processing. This prevents SQL injection, XSS attacks, and other security vulnerabilities.",
-      impact: "medium",
-      source: "https://security-guidelines.com/validation",
-    },
-    {
-      id: 3,
-      title: "Rate Limiting",
-      description:
-        "Implement rate limiting on all public APIs to prevent abuse and ensure fair usage. This helps maintain service stability and prevents DoS attacks.",
-      impact: "low",
-      source: "https://security-guidelines.com/rate-limiting",
-    },
+  const [selectedCategory, setSelectedCategory] = useState("laws");
+  const [laws, setLaws] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const categories = [
+    { id: "laws", label: "All" },
+    { id: "property", label: "Property" },
+    { id: "taxes", label: "Taxes" },
+    { id: "education", label: "Education" },
   ];
 
-  // Function to render impact icon based on severity
-  const getImpactIcon = (impact) => {
-    switch (impact.toLowerCase()) {
-      case "high":
-        return <AlertTriangle className="w-5 h-5 text-red-500" />;
-      case "medium":
-        return <AlertCircle className="w-5 h-5 text-yellow-500" />;
-      case "low":
-        return <Info className="w-5 h-5 text-blue-500" />;
-      default:
-        return <Shield className="w-5 h-5 text-gray-500" />;
+  const fetchLaws = async (category) => {
+    setIsLoading(true);
+    setError(null);
+    let source = localStorage.getItem("source") || "california";
+    let destination = localStorage.getItem("destination") || "texas";
+    try {
+      const response = await axios.post(
+        `http://localhost:8000/api/v1/states/compare`,
+        {
+          source_state: source,
+          target_state: destination,
+          comparison_type: category,
+        }
+      );
+      console.log(response);
+      setLaws(response.data.data);
+      setIsLoading(false);
+    } catch (err) {
+      setError(err.message || "Failed to fetch laws");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Function to get impact badge color
-  const getImpactColor = (impact) => {
-    switch (impact.toLowerCase()) {
-      case "high":
-        return "bg-red-100 text-red-800";
-      case "medium":
-        return "bg-yellow-100 text-yellow-800";
-      case "low":
-        return "bg-blue-100 text-blue-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
+  useEffect(() => {
+    fetchLaws(selectedCategory);
+  }, [selectedCategory]);
 
   return (
-    <div className="max-w-3xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
-        <BookOpen className="w-6 h-6" />
-        Security Rules and Guidelines
-      </h1>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-extrabold text-blue-900 flex flex-col items-center gap-2">
+            <BookOpen className="w-12 h-12 text-blue-600" />
+            State Laws Comparison
+          </h1>
+          <p className="mt-2 text-xl text-blue-700">
+            Understand the differences, make informed decisions
+          </p>
+        </div>
 
-      <div className="space-y-4">
-        {rules.map((rule) => (
-          <div
-            key={rule.id}
-            className="bg-white rounded-lg shadow-md p-4 border border-gray-200"
-          >
-            {/* Rule Header */}
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-2">
-                {getImpactIcon(rule.impact)}
-                <h2 className="text-lg font-semibold">{rule.title}</h2>
-              </div>
-              <span
-                className={`px-3 py-1 rounded-full text-sm font-medium ${getImpactColor(
-                  rule.impact
-                )}`}
+        <div className="mb-8">
+          <div className="flex flex-wrap justify-center gap-3">
+            {categories.map((category) => (
+              <button
+                key={category.id}
+                onClick={() => setSelectedCategory(category.id)}
+                className={`px-4 py-2 rounded-full text-lg font-bold uppercase tracking-wide transition-colors
+                  ${
+                    selectedCategory === category.id
+                      ? "bg-blue-600 text-white shadow-lg"
+                      : "bg-white text-blue-600 border-2 border-blue-200 hover:bg-blue-50"
+                  }`}
               >
-                {rule.impact.charAt(0).toUpperCase() + rule.impact.slice(1)}
-              </span>
-            </div>
-
-            {/* Rule Description */}
-            <p className="mt-2 text-gray-600">{rule.description}</p>
-
-            {/* Source Link */}
-            <a
-              href={rule.source}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-3 inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
-            >
-              <ExternalLink className="w-4 h-4" />
-              View Source
-            </a>
+                {category.label}
+              </button>
+            ))}
           </div>
-        ))}
+        </div>
+
+        {isLoading && (
+          <div className="flex justify-center items-center py-12">
+            <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
+          </div>
+        )}
+
+        {error && (
+          <div className="text-center py-12">
+            <div className="inline-flex items-center gap-2 text-red-600 text-xl">
+              <Info className="w-8 h-8" />
+              <p>{error}</p>
+            </div>
+            <button
+              onClick={() => fetchLaws(selectedCategory)}
+              className="mt-6 px-8 py-4 bg-blue-600 text-white rounded-full text-xl font-bold tracking-wide uppercase hover:bg-blue-700"
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {!isLoading && !error && (
+          <div className="grid gap-8">
+            {laws.map((law) => (
+              <div
+                key={law.id}
+                className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border-2 border-blue-100 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+              >
+                <h2 className="text-2xl sm:text-3xl font-bold text-blue-800 mb-4">
+                  {law.title}
+                </h2>
+
+                <p className="text-lg sm:text-xl text-blue-600 mb-6 font-semibold">
+                  {law.impact}
+                </p>
+
+                <p className="text-lg text-gray-700 mb-4">{law.description}</p>
+
+                <p className="text-gray-500 mb-6">
+                  Reference: {law.state_reference}
+                </p>
+
+                <a
+                  href={law.source_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-blue-600 text-lg font-semibold hover:text-blue-800 hover:underline"
+                >
+                  <ExternalLink className="w-6 h-6" />
+                  View Source
+                </a>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!isLoading && !error && laws.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-2xl text-gray-600">
+              No laws found matching your criteria
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

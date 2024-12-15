@@ -1,12 +1,12 @@
-import { Home, Map, FileText, Bell, Bot } from "lucide-react";
+import { Home, Map, FileText, Bell, Bot, Book } from "lucide-react";
 
 // Navigation items configuration
 const navItems = [
   { icon: Home, label: "Home", value: "home" },
-  { icon: FileText, label: "Laws", value: "laws" },
+  { icon: Book, label: "Laws", value: "laws" },
   { icon: Bot, label: "Assistant", value: "assistant" },
-  { icon: Map, label: "Property", value: "property" },
   { icon: Bell, label: "Emergency", value: "emergency" },
+  { icon: Map, label: "Map", value: "map" },
 ];
 
 // Bottom navigation component with mobile-friendly design
